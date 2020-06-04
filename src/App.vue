@@ -1,7 +1,7 @@
 <template>
   <div id="my-app">
-    <Buttons :ButtonStatus="ButtonStatus"></Buttons>
-    <Grid :Rows = "11" :Cols = "31" :ButtonStatus="ButtonStatus"></Grid>
+    <Buttons></Buttons>
+    <Grid :Rows = "11" :Cols = "31"></Grid>
   </div>
 </template>
 
@@ -13,15 +13,10 @@ export default {
   components:{
     'Buttons' : Buttons,
     'Grid'    : Grid
-  },
+  }, 
   data(){
     return {
-      ButtonStatus:{
-        isStartBtn      :  false,
-        isEndBtn        :  false,
-        isWallBtn       :  false,
-        isFindPathBtn   :  false
-      }
+      
     }
   }
 }

@@ -9,29 +9,64 @@
 </template>
 
 <script>
+import { ButtonBus } from "../main";
 
 export default {
   props: {
     Rows          : Number,
     Cols          : Number,
-    ButtonStatus  : Object,
   },
   data(){
     return {
+      ButtonBusData:{},
+      DivStates:{ 
+        Start : undefined,
+        End : undefined
+      }
     }
   },
   methods:{
-    ToggleClick:function(event){
-      if(this.ButtonStatus.isStartBtn){
-        console.log("Start",event.target.id);
-      }
-      else if(this.ButtonStatus.isEndBtn){
-        console.log("End",event.target.id);
-      }
-    },
+
     SetId:function(row,col){
       return row-1+'-'+Number(Number(col)-1);
+    },
+
+    ToggleClick:function(event){
+      if(this.ButtonBusData.isStartBtn){
+        console.log("Start",event.target.id);
+        this.ToggleStartClass(event);
+        
+      }
+      else if(this.ButtonBusData.isEndBtn){
+        console.log("End",event.target.id);
+        this.ToggleEndClass(event);
+      }
+    },
+
+    ToggleStartClass:function(event){
+      let previous = this.DivStates.Start;
+      if(!(typeof (previous) == 'undefined')){
+          previous.target.classList.toggle('Start');
+        }
+        this.DivStates.Start = event
+        event.target.classList.toggle('Start');
+    },
+
+    ToggleEndClass:function(event){
+      let previous = this.DivStates.End;
+      if(!(typeof (previous) == 'undefined')){
+          previous.target.classList.toggle('End');
+        }
+        this.DivStates.End = event
+        event.target.classList.toggle('End');
     }
+    
+    
+  },
+  created(){
+    ButtonBus.$on('ChangedButtonStatus',(data)=>{
+      this.ButtonBusData = data;
+    })
   }
 }
 </script>
@@ -97,5 +132,17 @@ export default {
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
+}
+
+.Empty {
+  background: rgb(255, 255, 255);
+}
+
+.Start {
+  background: rgb(82, 73, 68);
+}
+
+.End {
+  background: rgb(221, 169, 142);
 }
 </style>
