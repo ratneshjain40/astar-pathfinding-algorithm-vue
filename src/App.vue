@@ -1,18 +1,18 @@
 <template>
   <div id="my-app">
     <Buttons></Buttons>
-    <Grid :Rows = "11" :Cols = "31"></Grid>
+    <VizualizeGrid :Rows = "5" :Cols = "5"></VizualizeGrid>
   </div>
 </template>
 
 <script>
 import Buttons from './components/Buttons'
-import Grid from './components/Grid'
+import VizualizeGrid from './components/VizualizeGrid'
 
 export default {
   components:{
     'Buttons' : Buttons,
-    'Grid'    : Grid
+    'VizualizeGrid'    : VizualizeGrid
   }, 
   data(){
     return {

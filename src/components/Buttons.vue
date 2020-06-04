@@ -57,28 +57,3 @@ export default {
   }
 };
 </script>
-
-<style>
-.menu-buttons {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  margin-top: 2%;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-.menu-buttons .single-btn {
-  margin: 0 10px 0;
-}
-
-.make-wall-btn {
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-.make-wall-btn #wall-icon {
-  margin-left: 10px;
-}
-</style>
