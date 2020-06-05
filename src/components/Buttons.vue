@@ -4,7 +4,7 @@
       id="start-pos-btn"
       class="uk-button uk-button-primary single-btn"
       v-on:click="ToggleBtn('isStartBtn')"
-    >Start</button> 
+    >Start</button>
     <button
       id="end-pos-btn"
       class="uk-button uk-button-primary single-btn"
@@ -27,22 +27,26 @@
       class="uk-button uk-button-primary single-btn"
       v-on:click="ToggleBtn('isFindPathBtn')"
     >Find Path</button>
-    <button id="reset-btn" class="uk-button uk-button-primary single-btn">Reset</button>
+    <button
+      id="reset-btn"
+      class="uk-button uk-button-primary single-btn"
+      v-on:click="ToggleBtn('isResetBtn')"
+    >Reset</button>
   </div>
 </template>
 
 <script>
-import { ButtonBus } from "../main";
+import { EventBus } from "../main";
 
 export default {
-
   data() {
     return {
       ButtonStatus: {
         isStartBtn: false,
         isEndBtn: false,
         isWallBtn: false,
-        isFindPathBtn: false
+        isFindPathBtn: false,
+        isResetBtn: false
       }
     };
   },
@@ -51,8 +55,14 @@ export default {
       Object.keys(this.ButtonStatus).forEach(key => {
         this.ButtonStatus[key] = false;
       });
-      this.ButtonStatus[Btn] = true;
-      ButtonBus.$emit('ChangedButtonStatus',this.ButtonStatus);
+      if (Btn == "isResetBtn") {
+        EventBus.$emit("ResetNode", "Reset");
+      } else if (Btn == "isFindPathBtn") {
+        EventBus.$emit("FindPathNode", "FindPath");
+      } else {
+        this.ButtonStatus[Btn] = true;
+        EventBus.$emit("ChangedButtonStatus", this.ButtonStatus);
+      }
     }
   }
 };

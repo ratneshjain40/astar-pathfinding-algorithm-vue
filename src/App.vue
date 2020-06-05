@@ -1,25 +1,23 @@
 <template>
   <div id="my-app">
     <Buttons></Buttons>
-    <VizualizeGrid :Rows = "5" :Cols = "5"></VizualizeGrid>
+    <VizualizeGrid :Rows="11" :Cols="31"></VizualizeGrid>
   </div>
 </template>
 
 <script>
-import Buttons from './components/Buttons'
-import VizualizeGrid from './components/VizualizeGrid'
+import Buttons from "./components/Buttons";
+import VizualizeGrid from "./components/VizualizeGrid";
 
 export default {
-  components:{
-    'Buttons' : Buttons,
-    'VizualizeGrid'    : VizualizeGrid
-  }, 
-  data(){
-    return {
-      
-    }
+  components: {
+    Buttons: Buttons,
+    VizualizeGrid: VizualizeGrid
+  },
+  data() {
+    return {};
   }
-}
+};
 </script>
 
 <style>

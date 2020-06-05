@@ -1,8 +1,17 @@
 <template>
-  <div class="inner" :id="SetId(row,col)" v-on:click="ToggleClick"></div>
+  <div
+    class="inner"
+    :id="NodeData.ID"
+    :class="NodeData.class"
+    @mousedown="ToggleClick"
+    @mousemove="MoveWall"
+    @mouseup="NodeData.WallInteracion.isMouseDown = false"
+  ></div>
 </template>
 
 <script>
+import { EventBus } from "../main";
+
 export default {
   props: {
     row: Number,
@@ -10,16 +19,33 @@ export default {
     NodeData: Object
   },
   data() {
-    return {};
+    return {
+      ButtonBusData: {}
+    };
   },
   methods: {
-    SetId: function(row, col) {
-      return row - 1 + "-" + Number(Number(col) - 1);
+    ToggleClick: function() {
+      if (this.ButtonBusData.isStartBtn) {
+        EventBus.$emit("StartNode", this.NodeData);
+      } else if (this.ButtonBusData.isEndBtn) {
+        EventBus.$emit("EndNode", this.NodeData);
+      } else if (this.ButtonBusData.isWallBtn) {
+        EventBus.$emit("WallNode_OnMouseDown", this.NodeData);
+      }
     },
-
-    ToggleClick: function(event) {
-      console.log("Click is on Node"+event.target.id)
-    },
+    MoveWall: function() {
+      if (this.NodeData.WallInteracion.isMouseDown) {
+        EventBus.$emit("WallNode_OnMouseOver", this.NodeData);
+      }
+    }
+  },
+  created() {
+    EventBus.$on("ChangedButtonStatus", data => {
+      this.ButtonBusData = data;
+    });
+  },
+  updated() {
+    console.log("Updated =>", this.NodeData.ID);
   }
 };
 </script>
@@ -28,12 +54,13 @@ export default {
 .Empty {
   background: rgb(255, 255, 255);
 }
-
 .Start {
-  background: rgb(82, 73, 68);
+  background: rgb(170, 47, 16);
 }
-
 .End {
-  background: rgb(221, 169, 142);
+  background: rgb(167, 221, 142);
+}
+.Wall {
+  background: rgb(20, 59, 187);
 }
 </style>
