@@ -13,7 +13,7 @@
 <script>
 import Node from "./VizualizeNode";
 import { EventBus } from "../main";
-import {Algorithm }from "../algorithm/algorithm"
+import Algorithm from "../algorithm/algorithm";
 
 export default {
   props: {
@@ -29,7 +29,8 @@ export default {
       NodeProps: {
         CurrStart: {},
         CurrEnd: {},
-        CurrWallList: []
+        CurrWallList: [],
+        CurrActiveList: []
       },
       WallInteracion: {
         isMouseDown: false,
@@ -67,38 +68,51 @@ export default {
       });
     });
 
-    EventBus.$on("ResetNode", () => {
-      this.NodeProps.CurrStart.class = "Empty";
-      this.NodeProps.CurrEnd.class = "Empty";
-      this.NodeProps.CurrWallList.forEach(node => {
-        node.class = "Empty";
-      });
-
-      this.NodeProps.CurrStart = {};
-      this.NodeProps.CurrEnd = {};
-      this.NodeProps.CurrWallList = [];
-    });
-
-    EventBus.$on("FindPathNode", () => {
-
-
-
-
-
-    /*----------------------------CODE HERE*---------------------------*/
-
-
-
-
-
-    });
-
     const AddWall = WallNode => {
       if (!this.NodeProps.CurrWallList.includes(WallNode)) {
         WallNode.class = "Wall";
         this.NodeProps.CurrWallList.push(WallNode);
       }
     };
+
+    EventBus.$on("ResetNode", () => {
+      this.NodeProps.CurrStart.class = "Empty";
+      this.NodeProps.CurrEnd.class = "Empty";
+      this.NodeProps.CurrWallList.forEach(node => {
+        node.class = "Empty";
+      });
+      this.NodeProps.CurrActiveList.forEach(node => {
+        node.class = "Empty";
+      });
+
+      this.NodeProps.CurrStart = {};
+      this.NodeProps.CurrEnd = {};
+      this.NodeProps.CurrWallList = [];
+      this.NodeProps.CurrActiveList = [];
+    });
+
+    EventBus.$on("FindPath", () => {
+      Algorithm(
+        this.Rows,
+        this.Cols,
+        this.NodeProps.CurrStart.ID,
+        this.NodeProps.CurrEnd.ID,
+        this.NodeProps.CurrWallList
+      ).then(data => {
+        data.visitedNodes.forEach(NodeID => {
+          let i = NodeID[0];
+          let j = NodeID[1];
+          this.NodeDataList[i][j].class = "Visited";
+          this.NodeProps.CurrActiveList.push(this.NodeDataList[i][j]);
+        });
+        data.path.forEach(NodeID => {
+          let i = NodeID[0];
+          let j = NodeID[1];
+          this.NodeDataList[i][j].class = "Path";
+          this.NodeProps.CurrActiveList.push(this.NodeDataList[i][j]);
+        });
+      });
+    });
 
     let WallInteracion = this.WallInteracion;
     class VizualizeNode {

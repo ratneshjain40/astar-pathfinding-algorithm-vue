@@ -55,12 +55,19 @@ export default {
   background: rgb(255, 255, 255);
 }
 .Start {
-  background: rgb(170, 47, 16);
+  background: #a56e78;
 }
 .End {
-  background: rgb(167, 221, 142);
+  background: #7da870;
 }
 .Wall {
-  background: rgb(20, 59, 187);
+  background: #314149;
 }
+.Path {
+  background: #694f5d;
+}
+.Visited {
+  background: #e6a156;
+}
+
 </style>
