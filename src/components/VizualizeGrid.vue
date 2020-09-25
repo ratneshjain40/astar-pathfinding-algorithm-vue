@@ -3,7 +3,11 @@
     <div class="grid">
       <div class="row" v-for="row in Rows" :key="row">
         <div class="box" v-for="col in Cols" :key="col">
-          <Node :row="row" :col="col" :NodeData="NodeDataList[row-1][col-1]"></Node>
+          <Node
+            :row="row"
+            :col="col"
+            :NodeData="NodeDataList[row - 1][col - 1]"
+          ></Node>
         </div>
       </div>
     </div>
@@ -13,15 +17,14 @@
 <script>
 import Node from "./VizualizeNode";
 import { EventBus } from "../main";
-import Algorithm from "../algorithm/algorithm";
 
 export default {
   props: {
     Rows: Number,
-    Cols: Number
+    Cols: Number,
   },
   components: {
-    Node: Node
+    Node: Node,
   },
   data() {
     return {
@@ -30,19 +33,20 @@ export default {
         CurrStart: {},
         CurrEnd: {},
         CurrWallList: [],
-        CurrActiveList: []
+        CurrActiveList: [],
       },
       WallInteracion: {
         isMouseDown: false,
-        isMouseOver: false
-      }
+        isMouseOver: false,
+      },
     };
   },
 
   methods: {},
 
   created() {
-    EventBus.$on("StartNode", StartNode => {
+    
+    EventBus.$on("StartNode", (StartNode) => {
       if (this.NodeProps.CurrStart != undefined) {
         this.NodeProps.CurrStart.class = "Empty";
       }
@@ -51,7 +55,7 @@ export default {
       StartNode.class = "Start";
     });
 
-    EventBus.$on("EndNode", EndNode => {
+    EventBus.$on("EndNode", (EndNode) => {
       if (this.NodeProps.CurrEnd != undefined) {
         this.NodeProps.CurrEnd.class = "Empty";
       }
@@ -60,15 +64,15 @@ export default {
       EndNode.class = "End";
     });
 
-    EventBus.$on("WallNode_OnMouseDown", WallNode => {
+    EventBus.$on("WallNode_OnMouseDown", (WallNode) => {
       this.WallInteracion.isMouseDown = true;
       AddWall(WallNode);
-      EventBus.$on("WallNode_OnMouseOver", WallNode => {
+      EventBus.$on("WallNode_OnMouseOver", (WallNode) => {
         AddWall(WallNode);
       });
     });
 
-    const AddWall = WallNode => {
+    const AddWall = (WallNode) => {
       if (!this.NodeProps.CurrWallList.includes(WallNode)) {
         WallNode.class = "Wall";
         this.NodeProps.CurrWallList.push(WallNode);
@@ -78,10 +82,10 @@ export default {
     EventBus.$on("ResetNode", () => {
       this.NodeProps.CurrStart.class = "Empty";
       this.NodeProps.CurrEnd.class = "Empty";
-      this.NodeProps.CurrWallList.forEach(node => {
+      this.NodeProps.CurrWallList.forEach((node) => {
         node.class = "Empty";
       });
-      this.NodeProps.CurrActiveList.forEach(node => {
+      this.NodeProps.CurrActiveList.forEach((node) => {
         node.class = "Empty";
       });
 
@@ -92,28 +96,76 @@ export default {
     });
 
     EventBus.$on("FindPath", () => {
-      Algorithm(
-        this.Rows,
-        this.Cols,
-        this.NodeProps.CurrStart.ID,
-        this.NodeProps.CurrEnd.ID,
-        this.NodeProps.CurrWallList
-      ).then(data => {
-        data.visitedNodes.forEach(NodeID => {
-          let i = NodeID[0];
-          let j = NodeID[1];
-          this.NodeDataList[i][j].class = "Visited";
-          this.NodeProps.CurrActiveList.push(this.NodeDataList[i][j]);
+      // Data is recived from API
+      const wallsList = this.NodeProps.CurrWallList;
+      let wall_list = [];
+      wallsList.forEach((wallID) => {
+        wallID = wallID.ID.split(/-/);
+        let parsed_id = [parseInt(wallID[0]), parseInt(wallID[1])];
+        wall_list.push(parsed_id);
+      });
+
+      const startPos = this.NodeProps.CurrStart.ID.split(/-/);
+      const endPos = this.NodeProps.CurrEnd.ID.split(/-/);
+      let grid_size = [parseInt(this.Rows), parseInt(this.Cols)];
+
+      let data = {
+        grid_size: [[grid_size][0]],
+        start_pos: [[parseInt(startPos[0]), parseInt(startPos[1])]],
+        end_pos: [[parseInt(endPos[0]), parseInt(endPos[1])]],
+        wall_list: [wall_list],
+      };
+
+      async function fetch_path(data) {
+        let api_response = await fetch("http://127.0.0.1:5000/", {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-type": "application/json",
+          },
         });
-        data.path.forEach(NodeID => {
-          let i = NodeID[0];
-          let j = NodeID[1];
-          this.NodeDataList[i][j].class = "Path";
-          this.NodeProps.CurrActiveList.push(this.NodeDataList[i][j]);
+
+        let api_data = await api_response.json();
+
+        return api_data;
+      }
+      // Data is used for animations
+      let api_data = fetch_path(data);
+      api_data.then((data) => {
+        let visting_animation_time = data.visited.length * 250;
+        visting_animation_time += 100;
+
+        data.visited.forEach((NodeID_group, i) => {
+          setTimeout(() => {
+            NodeID_group.forEach((NodeID) => {
+              let i = NodeID[0];
+              let j = NodeID[1];
+              if (
+                !(
+                  (i == startPos[0] && j == startPos[1]) ||
+                  (i == endPos[0] && j == endPos[1])
+                )
+              ) {
+                this.NodeDataList[i][j].class = "Visited";
+                this.NodeProps.CurrActiveList.push(this.NodeDataList[i][j]);
+              }
+            });
+          }, i * 250);
         });
+        data.path.forEach((NodeID, i) => {
+          setTimeout(() => {
+            let i = NodeID[0];
+            let j = NodeID[1];
+            if (!(i == startPos[0] && j == startPos[1])) {
+              this.NodeDataList[i][j].class = "Path";
+              this.NodeProps.CurrActiveList.push(this.NodeDataList[i][j]);
+            }
+          }, i * 150 + visting_animation_time);
+        });
+        
       });
     });
-
+    // Initialize NODE objects
     let WallInteracion = this.WallInteracion;
     class VizualizeNode {
       constructor(i, j) {
@@ -135,7 +187,7 @@ export default {
       }
     }
     this.NodeDataList = NodeDataTemp;
-  }
+  },
 };
 </script>
 

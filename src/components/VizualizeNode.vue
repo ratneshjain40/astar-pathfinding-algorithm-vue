@@ -52,22 +52,65 @@ export default {
 
 <style>
 .Empty {
-  background: rgb(255, 255, 255);
+  background: rgb(167, 237, 255);
 }
 .Start {
-  background: #a56e78;
+  background: #ff9999;
 }
 .End {
-  background: #7da870;
+  background: #baff92;
 }
 .Wall {
   background: #314149;
 }
 .Path {
-  background: #694f5d;
+  background: rgb(0, 255, 170);
+  animation-name: fill;
+  animation-duration: 0.3s; 
+  animation-timing-function: ease-out; 
+  animation-delay: 0;
+  animation-iteration-count: 1;
+  animation-fill-mode: none;
+  animation-play-state: running;
 }
 .Visited {
-  background: #e6a156;
+  background: #1d92ff;
+  animation-name: stretch;
+  animation-duration: 0.5s; 
+  animation-timing-function: ease-out; 
+  animation-delay: 0;
+  animation-direction: alternate;
+  animation-iteration-count: 1;
+  animation-fill-mode: none;
+  animation-play-state: running;
+}
+
+
+@keyframes stretch {
+  0% {
+    transform: scale(.5);
+    background-color: rgb(0, 255, 170);
+    border-radius: 100%;
+  }
+  50% {
+    background-color: rgb(0, 195, 255);
+  }
+  100% {
+    transform: scale(1);
+    background-color: rgb(0, 132, 255);
+  }
+}
+
+@keyframes fill {
+  0% {
+    background-color: rgb(0, 132, 255);;
+  }
+  50% {
+    background-color: rgb(0, 195, 255);
+  }
+  100% {
+    background-color: rgb(0, 255, 170);
+  }
 }
 
 </style>
