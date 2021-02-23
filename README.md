@@ -20,5 +20,7 @@ npm run build
 npm run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Readme
+```
+Run the flask app from "astar_api" folder first, then run the npm scripts to setup front-end.
+```
