@@ -39,13 +39,13 @@ export default {
         isMouseDown: false,
         isMouseOver: false,
       },
+      animation: false,
     };
   },
 
   methods: {},
 
   created() {
-    
     EventBus.$on("StartNode", (StartNode) => {
       if (this.NodeProps.CurrStart != undefined) {
         this.NodeProps.CurrStart.class = "Empty";
@@ -130,39 +130,55 @@ export default {
         return api_data;
       }
       // Data is used for animations
+      let apply_visiting_animations = (data) => {
+        data.forEach((NodeID) => {
+          let i = NodeID[0];
+          let j = NodeID[1];
+          if (
+            !(
+              (i == startPos[0] && j == startPos[1]) ||
+              (i == endPos[0] && j == endPos[1])
+            )
+          ) {
+            this.NodeDataList[i][j].class = "Visited";
+            this.NodeProps.CurrActiveList.push(this.NodeDataList[i][j]);
+          }
+        });
+      }
+      let apply_path_animations = (NodeID) => {
+        let i = NodeID[0];
+        let j = NodeID[1];
+        if (!(i == startPos[0] && j == startPos[1])) {
+          this.NodeDataList[i][j].class = "Path";
+          this.NodeProps.CurrActiveList.push(this.NodeDataList[i][j]);
+        }
+      }
       let api_data = fetch_path(data);
       api_data.then((data) => {
+        // Time taken for visting animation to be completed (i = 250) and
+        // after how much time next path animation should continue (j = 100).
+        // k is the duration of each path animation.
         let visting_animation_time = data.visited.length * 250;
         visting_animation_time += 100;
 
         data.visited.forEach((NodeID_group, i) => {
-          setTimeout(() => {
-            NodeID_group.forEach((NodeID) => {
-              let i = NodeID[0];
-              let j = NodeID[1];
-              if (
-                !(
-                  (i == startPos[0] && j == startPos[1]) ||
-                  (i == endPos[0] && j == endPos[1])
-                )
-              ) {
-                this.NodeDataList[i][j].class = "Visited";
-                this.NodeProps.CurrActiveList.push(this.NodeDataList[i][j]);
-              }
-            });
-          }, i * 250);
+          if (this.animation) {
+            setTimeout(() => {
+              apply_visiting_animations(NodeID_group);
+            }, i * 250);
+          } else {
+            apply_visiting_animations(NodeID_group);
+          }
         });
         data.path.forEach((NodeID, i) => {
-          setTimeout(() => {
-            let i = NodeID[0];
-            let j = NodeID[1];
-            if (!(i == startPos[0] && j == startPos[1])) {
-              this.NodeDataList[i][j].class = "Path";
-              this.NodeProps.CurrActiveList.push(this.NodeDataList[i][j]);
-            }
-          }, i * 150 + visting_animation_time);
+          if (this.animation) {
+            setTimeout(() => {
+              apply_path_animations(NodeID);
+            }, i * 150 + visting_animation_time);
+          } else {
+            apply_path_animations(NodeID);
+          }
         });
-        
       });
     });
     // Initialize NODE objects
